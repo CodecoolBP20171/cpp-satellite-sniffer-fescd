@@ -1,0 +1,10 @@
+﻿  stdafx.cpp
+  globals.cpp
+  cVector.cpp
+  cTLE.cpp
+  cSite.cpp
+  coord.cpp
+  cJulian.cpp
+  cEci.cpp
+  Generating Code...
+  core.vcxproj -> C:\Users\szila\source\repos\orbitTools\orbitToolsDemo\Win32\Debug\orbitTools.core.lib
