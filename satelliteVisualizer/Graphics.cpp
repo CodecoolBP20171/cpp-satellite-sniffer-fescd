@@ -1,78 +1,59 @@
 #include "Graphics.h"
-#include <iostream>
 
 
-
-Graphics::Graphics()
-{
-	if (!init()) { printf("Failed to initialize!\n"); }
-	if (!loadMedia()) { printf("Failed to load media!\n"); }
+Graphics::~Graphics() {
+	if (renderer) SDL_DestroyRenderer(renderer);
+	if (window) SDL_DestroyWindow(window);
+	IMG_Quit();
+	SDL_Quit();
 }
-
-Graphics::~Graphics() {}
 
 bool Graphics::init() {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		printf("SDL could not initialize! SDL Error: %s\n", SDL_GetError());
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return false;
 	}
-	if (!SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1")) {
-		printf("Warning: Linear texture filtering not enabled!");
-	}
-
-	std::unique_ptr<SDL_Window, sdl_deleter> window(
-		SDL_CreateWindow("Satellite visualizer", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-			1029, 873, SDL_WINDOW_SHOWN),
-		sdl_deleter());
-	if (!window) {
-		printf("Window could not be created! SDL Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	gWindow = std::move(window);
-
-	std::unique_ptr<SDL_Renderer, sdl_deleter> renderer(
-		SDL_CreateRenderer(gWindow.get(), -1, SDL_RENDERER_ACCELERATED),
-		sdl_deleter());
-
-	if (!renderer) {
-		printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError());
-		return false;
-	}
-
-	gRenderer = std::move(renderer);
-
-	SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
-
+	if (!createWindow()) return false;
+	if (!createRenderer()) return false;
+	if (!initSDLImage()) return false;
 	return true;
 }
 
-bool Graphics::loadMedia() {
-	
-	SDL_Surface* loadedSurface = nullptr;
+std::shared_ptr<Texture> Graphics::loadTexture(const std::string& filename) {
+	SDL_Texture* imgTexture = IMG_LoadTexture_RW(renderer,
+		SDL_RWFromFile(filename.c_str(), "rb"),
+		1);
+	if (nullptr == imgTexture) {
+		printf("File not found: %s SDL_image Error: %s\n", filename.c_str(), IMG_GetError());
+	}
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>(imgTexture);
+	return texture;
+}
 
-	std::string path = "";
-
-
-	std::unique_ptr<SDL_Texture, sdl_deleter> newTexture(
-			SDL_CreateTextureFromSurface(gRenderer.get(), loadedSurface),
-			sdl_deleter());
-
-	background = std::move(newTexture);
-	SDL_FreeSurface(loadedSurface);
-
-	SDL_Rect bg = { 0, 0, 1029, 873 };
-	SDL_RenderCopy(gRenderer.get(), background.get(), nullptr, &bg);
-	SDL_RenderPresent(gRenderer.get());
-	SDL_Delay(6000);
+bool Graphics::createWindow() {
+	window = SDL_CreateWindow("Flat Earth Society Codecool Division", 40, 40, 823, 698, SDL_WINDOW_SHOWN);
+	if (window == nullptr) {
+		std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+		return false;
+	}
 	return true;
 }
 
-void Graphics::close() {
-	//this order is important!
-	background.reset();
-	gRenderer.reset();
-	gWindow.reset();
+bool Graphics::createRenderer() {
+	if (!window) return false;
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == nullptr) {
+		std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
+		return false;
+	}
+	return true;
+}
 
-	SDL_Quit();
+bool Graphics::initSDLImage() {
+	int imgFlags = IMG_INIT_PNG;
+	if (!(IMG_Init(imgFlags) & imgFlags)) {
+		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+		return false;
+	}
+	return true;
 }
