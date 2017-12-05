@@ -3,7 +3,6 @@
 #include <memory>
 
 #include <SDL.h>
-#include <SDL_>
 #include <cstdio>
 #include <string>
 #include <map>

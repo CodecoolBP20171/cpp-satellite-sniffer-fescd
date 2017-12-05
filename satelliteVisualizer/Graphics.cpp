@@ -44,11 +44,6 @@ bool Graphics::init() {
 
 	SDL_SetRenderDrawColor(gRenderer.get(), 0xFF, 0xFF, 0xFF, 0xFF);
 
-	int imgFlags = IMG_INIT_PNG;
-	if (!(IMG_Init(imgFlags) & imgFlags)) {
-		printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
-		return false;
-	}
 	return true;
 }
 
@@ -58,7 +53,6 @@ bool Graphics::loadMedia() {
 
 	std::string path = "";
 
-	loadedSurface = IMG_Load(path.c_str());
 
 	std::unique_ptr<SDL_Texture, sdl_deleter> newTexture(
 			SDL_CreateTextureFromSurface(gRenderer.get(), loadedSurface),
@@ -80,6 +74,5 @@ void Graphics::close() {
 	gRenderer.reset();
 	gWindow.reset();
 
-	IMG_Quit();
 	SDL_Quit();
 }
