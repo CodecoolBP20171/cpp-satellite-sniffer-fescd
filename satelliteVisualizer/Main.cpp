@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Graphics.h"
 #include "Main.h"
+#include "Sky.h"
 
 using namespace std;
 
@@ -17,8 +18,11 @@ bool handleEvents(SDL_Event &event) {
 	return quit;
 }
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]) {
+
+	Sky sky;
+	sky.evaluate();
+
 	Graphics graphics;
 	graphics.init();
 	std::shared_ptr<Texture> background = graphics.loadTexture("MercatorEarth.png");
