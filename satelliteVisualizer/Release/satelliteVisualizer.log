@@ -1,6 +1,0 @@
-﻿  Graphics.cpp
-e:\sat\satellitevisualizer\Graphics.h(4): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
-  Main.cpp
-e:\sat\satellitevisualizer\Graphics.h(4): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
-  Texture.cpp
-e:\sat\satellitevisualizer\Texture.h(3): fatal error C1083: Cannot open include file: 'SDL_render.h': No such file or directory
