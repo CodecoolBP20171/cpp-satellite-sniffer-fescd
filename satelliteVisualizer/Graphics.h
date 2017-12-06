@@ -13,6 +13,7 @@ public:
 	bool init();
 	std::shared_ptr<Texture> loadTexture(const std::string& filename);
 	SDL_Renderer* getRenderer() { return renderer; }
+	void putSatToSky(const int x, const int y);
 
 private:
 	SDL_Window * window;

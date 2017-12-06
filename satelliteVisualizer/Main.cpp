@@ -20,13 +20,19 @@ bool handleEvents(SDL_Event &event) {
 
 int main(int argc, char * argv[]) {
 
-	Sky sky;
-	sky.evaluate();
-
-	Graphics graphics;
-	graphics.init();
-	std::shared_ptr<Texture> background = graphics.loadTexture("MercatorEarth.png");
 	
+	std::shared_ptr<Graphics> graphics = std::make_shared<Graphics>();
+	graphics->init();
+	std::shared_ptr<Texture> background = graphics->loadTexture("MercatorEarth.png");
+
+	SDL_RenderClear(graphics->getRenderer());
+	background->render(graphics->getRenderer(), nullptr);
+	SDL_RenderPresent(graphics->getRenderer());
+
+	
+	Sky sky;
+	sky.setGraphics(graphics);	
+
 	bool quit = false;
 	Uint32 timepassed = 0;
 	Uint32  timestep = 16;
@@ -35,15 +41,16 @@ int main(int argc, char * argv[]) {
 		SDL_Event sdl_event;
 		while (SDL_PollEvent(&sdl_event) != 0) {
 			quit = handleEvents(sdl_event);
-			SDL_RenderClear(graphics.getRenderer());
-			background->render(graphics.getRenderer(), nullptr);
-			SDL_RenderPresent(graphics.getRenderer());
+			SDL_RenderClear(graphics->getRenderer());
+			background->render(graphics->getRenderer(), nullptr);
+			sky.evaluate();
+			SDL_RenderPresent(graphics->getRenderer());
 			while (timepassed + timestep > SDL_GetTicks()) {
 				SDL_Delay(0);
 			}
 		}
 	}
-	graphics.~Graphics();
+	graphics->~Graphics();
 	system("pause");
 	
 	return 0;

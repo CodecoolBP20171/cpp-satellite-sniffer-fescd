@@ -72,10 +72,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(ProjectDir)..\orbitTools\core;$(ProjectDir)..\orbitTools\orbit;$(SolutionDir)SDL2-2.0.7\include;$(SolutionDir)SDL2_image-2.0.2\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\orbitTools\orbit;$(ProjectDir)..\orbitTools\core;$(SolutionDir)SDL2-2.0.7\lib\x86;$(SolutionDir)SDL2_image-2.0.2\lib\x86;$(LibraryPath)</LibraryPath>
+    <OutDir>.\bin</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(ProjectDir)..\orbitTools\core;$(ProjectDir)..\orbitTools\orbit;$(SolutionDir)SDL2-2.0.7\include;$(SolutionDir)SDL2_image-2.0.2\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)..\orbitTools\orbit;$(ProjectDir)..\orbitTools\core;$(SolutionDir)SDL2-2.0.7\lib\x86;$(SolutionDir)SDL2_image-2.0.2\lib\x86;$(LibraryPath)</LibraryPath>
+    <OutDir>.\bin</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

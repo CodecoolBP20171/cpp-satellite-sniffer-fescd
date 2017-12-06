@@ -13,6 +13,7 @@ Sky::~Sky()
 
 void Sky::evaluate()
 {
+	auto display = graphics.lock();
 	/*
 		string str1 = "SGP4 Test";
 		string str2 = "1 88888U          80275.98708465  .00073094  13844-3  66816-4 0     8";
@@ -35,6 +36,7 @@ void Sky::evaluate()
 			budapest.first = 47.497912;
 			budapest.second = 19.040235;
 			
+			display->putSatToSky(mapcoordinates.first, mapcoordinates.second);
 
 			MapCoordinates bpmapcoordinates = getCoordinatesFromGPSData(budapest);
 
@@ -140,14 +142,14 @@ void Sky::evaluate()
 	}
 
 	MapCoordinates Sky::getCoordinatesFromGPSData(Coordinates coordinates) {
-		float mapWidth = 823;
-		float mapHeight = 698;
+		double mapWidth = 823;
+		double mapHeight = 698;
 		//float mapWidth = 2058;
 		//float mapHeight = 1746;
 
 		int x = (coordinates.second + 180) * (mapWidth / 360);
-		float latRad = coordinates.first * pi / 180;
-		float mercN = log(tan((pi / 4) + (latRad / 2)));
+		double latRad = coordinates.first * pi / 180;
+		double mercN = log(tan((pi / 4) + (latRad / 2)));
 		int y = (mapHeight / 2) - (mapWidth*mercN / (2 * pi));
 		MapCoordinates result;
 		result.first = x;
@@ -155,3 +157,7 @@ void Sky::evaluate()
 		return result;
 	}
 
+	void Sky::setGraphics(std::shared_ptr<Graphics> g)
+	{
+		graphics = g;
+	}
