@@ -34,10 +34,11 @@ void Graphics::putSatToSky(const int x, const int y)
 {
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);	
 	SDL_RenderDrawPoint(renderer, x, y);
-	SDL_RenderDrawPoint(renderer, x+1, y);
+	SDL_RenderDrawPoint(renderer, x, y-1);
 	SDL_RenderDrawPoint(renderer, x, y+1);
-	SDL_RenderDrawPoint(renderer, x+1, y+1);
-}
+	SDL_RenderDrawPoint(renderer, x + 1, y);
+	SDL_RenderDrawPoint(renderer, x - 1, y);
+	}
 
 bool Graphics::createWindow() {
 	window = SDL_CreateWindow("Flat Earth Society Codecool Division", 40, 40, 823, 698, SDL_WINDOW_SHOWN);

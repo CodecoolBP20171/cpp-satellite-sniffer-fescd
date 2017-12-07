@@ -2,6 +2,7 @@
 #include <iostream>
 #include <time.h>
 
+
 Sky::Sky()
 {
 }
@@ -20,24 +21,32 @@ void Sky::evaluate()
 		string str2 = "1 88888U          80275.98708465  .00073094  13844-3  66816-4 0     8";
 		string str3 = "2 88888  72.8435 115.9689 0086731  52.6988 110.5714 16.05824518   105";
 */
+	/*
 		string str1 = "ISS";
 		string str2 = "1 25544U 98067A   17340.55265046  .00003773  00000-0  64291-4 0  9994";
 		string str3 = "2 25544  51.6431 259.0525 0003227 200.2075 144.0367 15.54093333 88557";
-					   
+	*/
+	
+	string str1 = "AMAZONAS 5";
+	string str2 = "1 42934U 17053A   17341.20688987 -.00000289 +00000-0 +00000-0 0  9992";
+	string str3 = "2 42934 000.0253 317.2814 0004220 319.6748 172.6992 01.00270149000905";
 
 		cTle tleSGP4(str1, str2, str3);
 
 		cSatellite satSGP4(tleSGP4);
-
-		for (int i = 0; i < 360; i = i + 1) {
+		int timeStep = 1; //in minutes
+		//for (int i = 0; i < 3600; i = i + timeStep) {
+		cEciTime eci = satSGP4.PositionEci(0);
+		/*	
 			cEciTime eci = satSGP4.PositionEci(i);
-			/*
 			double TEST_X = 6378.137 + 600;
 			double TEST_Y = 0;
 			double TEST_Z = 0;
 
 			Coordinates testCoordinates = eciToGeodeticTEST(TEST_X, TEST_Y, TEST_Z);
-			*/
+		*/	
+
+
 			Coordinates coordinates = eciToGeodetic(eci);
 			MapCoordinates mapcoordinates = getCoordinatesFromGPSData(coordinates);
 			Coordinates budapest;
@@ -58,7 +67,7 @@ void Sky::evaluate()
 
 			//std::cout << "BUDAPEST_MAP_X: " << bpmapcoordinates.first << " BUDAPEST_MAP_Y: " << bpmapcoordinates.second << std::endl;
 
-		}
+		//}
 		
 		//PrintPosVel(satSGP4);
 
@@ -134,7 +143,7 @@ void Sky::evaluate()
 		const double R = sqrt((eciCoords.Position().m_x * eciCoords.Position().m_x) + (eciCoords.Position().m_y * eciCoords.Position().m_y));
 		const double f = (a - b) / a;
 		const double e2 = ((2 * f) - (f * f));
-		double longitude = atan2(eciCoords.Position().m_y, eciCoords.Position().m_x)-GMST;
+		double longitude = atan2(eciCoords.Position().m_y, eciCoords.Position().m_x);// -GMST;
 		const double kmax = 20;
 		auto k = 0;
 		auto latitude = atan2(
