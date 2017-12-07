@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include "coreLib.h"
 #include "orbitLib.h"
-#include <memory>
-#include "Graphics.h"
 
 typedef std::pair<double, double> Coordinates;
 typedef std::pair<int, int> MapCoordinates;
@@ -16,13 +14,14 @@ public:
 	Sky();
 	~Sky();
 
-	void evaluate();
-	void PrintPosVel(const cSatellite& sat);
-	Coordinates eciToGeodetic(const cEci &eciCoords) const;
-	MapCoordinates getCoordinatesFromGPSData(Coordinates coordinates);
-	void setGraphics(std::shared_ptr<Graphics> graphics);
+	void processTLE();
+	vector<MapCoordinates> GetSATPos(int timeDelta);
+
 private:
 	const double pi = atan(1) * 4;
-	std::weak_ptr<Graphics> graphics;
+	vector<cSatellite> satellites;
+	
+	MapCoordinates getCoordinatesFromGPSData(Coordinates coordinates);
+	Coordinates eciToGeodetic(const cEci &eciCoords) const;
 };
 

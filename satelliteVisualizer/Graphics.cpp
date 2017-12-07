@@ -1,42 +1,22 @@
 #include "Graphics.h"
 
+Graphics::Graphics() 
+	: window(nullptr), renderer(nullptr) 
+{
+	init();
+	background = loadTexture("MercatorEarth.png");
+
+	SDL_RenderClear(renderer);
+	background->render(renderer, nullptr);
+	SDL_RenderPresent(renderer);
+	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+}
 
 Graphics::~Graphics() {
 	if (renderer) SDL_DestroyRenderer(renderer);
 	if (window) SDL_DestroyWindow(window);
 	IMG_Quit();
 	SDL_Quit();
-}
-
-bool Graphics::init() {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
-		return false;
-	}
-	if (!createWindow()) return false;
-	if (!createRenderer()) return false;
-	if (!initSDLImage()) return false;
-	return true;
-}
-
-std::shared_ptr<Texture> Graphics::loadTexture(const std::string& filename) {
-	SDL_Texture* imgTexture = IMG_LoadTexture_RW(renderer,
-		SDL_RWFromFile(filename.c_str(), "rb"),
-		1);
-	if (nullptr == imgTexture) {
-		printf("File not found: %s SDL_image Error: %s\n", filename.c_str(), IMG_GetError());
-	}
-	std::shared_ptr<Texture> texture = std::make_shared<Texture>(imgTexture);
-	return texture;
-}
-
-void Graphics::putSatToSky(const int x, const int y)
-{
-	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);	
-	SDL_RenderDrawPoint(renderer, x, y);
-	SDL_RenderDrawPoint(renderer, x+1, y);
-	SDL_RenderDrawPoint(renderer, x, y+1);
-	SDL_RenderDrawPoint(renderer, x+1, y+1);
 }
 
 bool Graphics::createWindow() {
@@ -65,4 +45,36 @@ bool Graphics::initSDLImage() {
 		return false;
 	}
 	return true;
+}
+
+bool Graphics::init() {
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		std::cout << "SDL_Init Error: " << SDL_GetError() << std::endl;
+		return false;
+	}
+	if (!createWindow()) return false;
+	if (!createRenderer()) return false;
+	if (!initSDLImage()) return false;
+	return true;
+}
+
+std::shared_ptr<Texture> Graphics::loadTexture(const std::string& filename) {
+	SDL_Texture* imgTexture = IMG_LoadTexture_RW(renderer,
+		SDL_RWFromFile(filename.c_str(), "rb"),
+		1);
+	if (nullptr == imgTexture) {
+		printf("File not found: %s SDL_image Error: %s\n", filename.c_str(), IMG_GetError());
+	}
+	std::shared_ptr<Texture> texture = std::make_shared<Texture>(imgTexture);
+	return texture;
+}
+
+void Graphics::putSatToSky(unsigned int x, unsigned int y)
+{	
+	SDL_Rect fillRect = { x, y, 2, 2 };
+	SDL_RenderFillRect(renderer, &fillRect);
+}
+
+void Graphics::showAllSat() {
+	SDL_RenderPresent(renderer);
 }

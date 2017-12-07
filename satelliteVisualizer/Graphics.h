@@ -8,16 +8,19 @@
 
 class Graphics {
 public:
-	Graphics() : window(nullptr), renderer(nullptr) {}
+	Graphics();
 	~Graphics();
 	bool init();
 	std::shared_ptr<Texture> loadTexture(const std::string& filename);
 	SDL_Renderer* getRenderer() { return renderer; }
-	void putSatToSky(const int x, const int y);
+	void putSatToSky(unsigned int x, unsigned int y);
+	void showAllSat();
 
 private:
 	SDL_Window * window;
 	SDL_Renderer *renderer;
+	std::shared_ptr<Texture> background;
+	
 	bool createWindow();
 	bool createRenderer();
 	bool initSDLImage();

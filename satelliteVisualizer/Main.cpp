@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Graphics.h"
-#include "Main.h"
 #include "Sky.h"
+#include "Main.h"
 
 using namespace std;
 
@@ -20,37 +20,31 @@ bool handleEvents(SDL_Event &event) {
 
 int main(int argc, char * argv[]) {
 
-	
-	std::shared_ptr<Graphics> graphics = std::make_shared<Graphics>();
-	graphics->init();
-	std::shared_ptr<Texture> background = graphics->loadTexture("MercatorEarth.png");
-
-	SDL_RenderClear(graphics->getRenderer());
-	background->render(graphics->getRenderer(), nullptr);
-	SDL_RenderPresent(graphics->getRenderer());
-
-	
+	Graphics graphics;
 	Sky sky;
-	sky.setGraphics(graphics);	
 
 	bool quit = false;
+	int timeDelta = 0;
+	
+
 	Uint32 timepassed = 0;
 	Uint32  timestep = 16;
+	
 	while (!quit) {
-		timepassed = SDL_GetTicks();
-		SDL_Event sdl_event;
-		while (SDL_PollEvent(&sdl_event) != 0) {
-			quit = handleEvents(sdl_event);
-			SDL_RenderClear(graphics->getRenderer());
-			background->render(graphics->getRenderer(), nullptr);
-			sky.evaluate();
-			SDL_RenderPresent(graphics->getRenderer());
-			while (timepassed + timestep > SDL_GetTicks()) {
-				SDL_Delay(0);
-			}
+		vector<MapCoordinates> coords = sky.GetSATPos(timeDelta);
+		int max = coords.size();
+		
+		for (auto i = 0; i < max; i++) {
+			graphics.putSatToSky(coords[i].first, coords[i].second);
 		}
+			
+		graphics.showAllSat();
+		SDL_Delay(1000);
+		timeDelta++;
+		if (timeDelta == 180) quit = true;
 	}
-	graphics->~Graphics();
+	
+	graphics.~Graphics();
 	system("pause");
 	
 	return 0;
