@@ -1,5 +1,6 @@
 #include "Sky.h"
 #include <iostream>
+#include <time.h>
 
 Sky::Sky()
 {
@@ -28,8 +29,15 @@ void Sky::evaluate()
 
 		cSatellite satSGP4(tleSGP4);
 
-		for (int i = 0; i < 30*48; i = i + 30) {
+		for (int i = 0; i < 360; i = i + 1) {
 			cEciTime eci = satSGP4.PositionEci(i);
+			/*
+			double TEST_X = 6378.137 + 600;
+			double TEST_Y = 0;
+			double TEST_Z = 0;
+
+			Coordinates testCoordinates = eciToGeodeticTEST(TEST_X, TEST_Y, TEST_Z);
+			*/
 			Coordinates coordinates = eciToGeodetic(eci);
 			MapCoordinates mapcoordinates = getCoordinatesFromGPSData(coordinates);
 			Coordinates budapest;
@@ -43,6 +51,8 @@ void Sky::evaluate()
 			std::cout << "ECI_X: " << eci.Position().m_x << " ECI_Y: " << eci.Position().m_y << " ECI_Z: " << eci.Position().m_z << std::endl;
 
 			std::cout << "latitude: " << coordinates.first << " longitude: " << coordinates.second << std::endl;
+
+			//std::cout << "TEST_latitude: " << testCoordinates.first << " TEST_longitude: " << testCoordinates.second << std::endl;
 
 			std::cout << "MAP_X: " << mapcoordinates.first << " MAP_Y: " << mapcoordinates.second << std::endl;
 
@@ -114,13 +124,17 @@ void Sky::evaluate()
 	
 	
 	Coordinates Sky::eciToGeodetic(const cEci &eciCoords) const {
+		time_t timer;
+		time(&timer);
+		cJulian cjulian(timer);
+		double GMST = cjulian.ToGmst();
 		Coordinates result;
 		const double a = 6378.137;
 		const double b = 6356.7523142;
 		const double R = sqrt((eciCoords.Position().m_x * eciCoords.Position().m_x) + (eciCoords.Position().m_y * eciCoords.Position().m_y));
 		const double f = (a - b) / a;
 		const double e2 = ((2 * f) - (f * f));
-		double longitude = atan2(eciCoords.Position().m_y, eciCoords.Position().m_x);
+		double longitude = atan2(eciCoords.Position().m_y, eciCoords.Position().m_x)-GMST;
 		const double kmax = 20;
 		auto k = 0;
 		auto latitude = atan2(
@@ -141,13 +155,55 @@ void Sky::evaluate()
 		return result;
 	}
 
+	Coordinates Sky::eciToGeodeticTEST(double x, double y, double z) {
+		time_t timer;
+		time(&timer);
+		cJulian cjulian(timer);
+		double GMST = cjulian.ToGmst();
+		std::cout << "GMST: " << GMST << std::endl;
+		double degs = 180.0 / pi;
+		
+		Coordinates result;
+		const double a = 6378.137;
+		const double b = 6356.7523142;
+		const double R = sqrt((x * x) + (y * y));
+		const double f = (a - b) / a;
+		const double e2 = ((2 * f) - (f * f));
+		double longitude = atan2(y, x) - GMST;
+		std::cout << "LONGITUDE " << longitude << std::endl;
+		const double kmax = 20;
+		auto k = 0;
+		auto latitude = atan2(
+			z,
+			sqrt((x * x) + (y * y)));
+		double C;
+		while (k < kmax) {
+			C = 1 / sqrt(1 - (e2 * (sin(latitude) * sin(latitude))));
+			latitude = atan2(z + (a * C * e2 * sin(latitude)), R);
+			k += 1;
+		}
+		const double height = (R / cos(latitude)) - (a * C);
+		std::cout << "HEIGHT " << height << std::endl;
+		std::cout << "LATITUDE " << latitude << std::endl;
+		longitude = longitude * 180 / pi;
+		latitude = latitude * 180 / pi;
+		result.first = latitude;
+		result.second = longitude;
+
+		//result.first = 200;
+		//result.second = 300;
+		//return { longitude, latitude, height };
+		return result;
+	}
+
 	MapCoordinates Sky::getCoordinatesFromGPSData(Coordinates coordinates) {
 		double mapWidth = 823;
 		double mapHeight = 698;
 		//float mapWidth = 2058;
 		//float mapHeight = 1746;
-
+		
 		int x = (coordinates.second + 180) * (mapWidth / 360);
+		if (x < 0) x += mapWidth;
 		double latRad = coordinates.first * pi / 180;
 		double mercN = log(tan((pi / 4) + (latRad / 2)));
 		int y = (mapHeight / 2) - (mapWidth*mercN / (2 * pi));
