@@ -1,5 +1,6 @@
 #include "Sky.h"
 #include <iostream>
+#include <fstream>
 
 Sky::Sky() {
 	processTLE();
@@ -10,26 +11,28 @@ Sky::~Sky() {}
 
 void Sky::processTLE()
 {
-	
-	string str1 = "SGP4 Test";
-	string str2 = "1 88888U          80275.98708465  .00073094  13844-3  66816-4 0     8";
-	string str3 = "2 88888  72.8435 115.9689 0086731  52.6988 110.5714 16.05824518   105";
-		
-	string stri1 = "ISS";
-	string stri2 = "1 25544U 98067A   17340.55265046  .00003773  00000-0  64291-4 0  9994";
-	string stri3 = "2 25544  51.6431 259.0525 0003227 200.2075 144.0367 15.54093333 88557";
-					   
+	ifstream file;
+	file.open("tle.txt");
 
-	cTle tleSGP4(str1, str2, str3);
-	cTle iss(stri1, stri2, stri3);
-
-	cSatellite one(tleSGP4);
-	cSatellite two(iss);
-
-	satellites.push_back(one);
-	satellites.push_back(two);
-
+	if (!file) { 
+		cout << "Cannot open input file"; 
 	}
+	
+	std::string line;
+
+	while (std::getline(file, line))
+	{
+		string str1 = line;
+		std::getline(file, line);
+		string str2 = line;
+		std::getline(file, line);
+		string str3 = line;
+
+		cTle tle(str1, str2, str3);
+		cSatellite sat(tle);
+		satellites.push_back(sat);
+	}
+}
 
 	vector<MapCoordinates> Sky::GetSATPos(int timeDelta)
 	{
